@@ -1,36 +1,33 @@
-'use client'
+"use client";
 
-import { BaseError } from 'viem'
-import { useContractWrite, useWaitForTransaction } from 'wagmi'
+import { BaseError } from "viem";
+import { useContractWrite, useWaitForTransaction } from "wagmi";
 
-import { wagmiContractConfig } from './contracts'
-import { stringify } from '../utils/stringify'
+import { wagmiContractConfig } from "./contracts";
+import { stringify } from "../utils/stringify";
 
 export function WriteContract() {
-  const { write, data, error, isLoading, isError } = useContractWrite({
+  const { writeAsync, data, error, isLoading, isError } = useContractWrite({
     ...wagmiContractConfig,
-    functionName: 'mint',
-  })
+    functionName: "setGreeting",
+    args: ["Hello"],
+    value: "0.1",
+  });
   const {
     data: receipt,
     isLoading: isPending,
     isSuccess,
-  } = useWaitForTransaction({ hash: data?.hash })
+  } = useWaitForTransaction({ hash: data?.hash });
 
   return (
     <>
       <h3>Mint a wagmi</h3>
       <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          const formData = new FormData(e.target as HTMLFormElement)
-          const tokenId = formData.get('tokenId') as string
-          write({
-            args: [BigInt(tokenId)],
-          })
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await writeAsync();
         }}
       >
-        <input name="tokenId" placeholder="token id" />
         <button disabled={isLoading} type="submit">
           Mint
         </button>
@@ -48,5 +45,5 @@ export function WriteContract() {
       )}
       {isError && <div>{(error as BaseError)?.shortMessage}</div>}
     </>
-  )
+  );
 }
