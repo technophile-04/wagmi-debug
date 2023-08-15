@@ -1,17 +1,21 @@
 "use client";
 
-import { BaseError } from "viem";
-import { useContractWrite, useWaitForTransaction } from "wagmi";
+import { BaseError, parseEther } from "viem";
+import { useContractWrite, useWaitForTransaction, Address } from "wagmi";
 
 import { wagmiContractConfig } from "./contracts";
 import { stringify } from "../utils/stringify";
+// import { type Address } from "viem";
+
+const address: Address = "abcd";
 
 export function WriteContract() {
   const { writeAsync, data, error, isLoading, isError } = useContractWrite({
-    ...wagmiContractConfig,
+    abi: wagmiContractConfig.abi,
+    address: wagmiContractConfig.address,
     functionName: "setGreeting",
     args: ["Hello"],
-    value: "0.1",
+    value: parseEther("0.1"),
   });
   const {
     data: receipt,
